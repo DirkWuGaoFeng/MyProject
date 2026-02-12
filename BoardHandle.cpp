@@ -56,7 +56,12 @@ void BoardHandle::initializeBoardHandle()
     m_mapBoardInfo[3] = stOscBoard;
 }
 
-void BoardHandle::GetAllBoardInfo(const int &iBoardId, BoardNode& boardNode)
+void BoardHandle::CreateBoardInfo(const int &iBoardId, const BoardNode& boardNode)
+{
+    m_mapBoardInfo[iBoardId] = boardNode;
+}
+
+void BoardHandle::GetBoardInfo(const int &iBoardId, BoardNode& boardNode)
 {
     boardNode = m_mapBoardInfo[iBoardId];
 }

@@ -147,12 +147,29 @@ void GetAlarmLevel(const PortNode& stPortNode, set<AlarmLevel>& vecAlarmLevel) {
 bool GetPairPortNode(const PortNode& stPortNode, PortNode& stPairPortNode) {
     unique_lock<mutex> lock(mtx_port_fiber);
     if (m_mapPortNode2Fiber.find(stPortNode) != m_mapPortNode2Fiber.end()) {
-        for (auto& stPort : m_mapPortNode2Fiber[stPortNode].m_vPortNode) {
-            if (stPort != stPortNode) {
-                stPairPortNode = stPort;
-                return true;
+        PortNode stSrcPort = m_mapPortNode2Fiber[stPortNode].m_SrcPortNode;
+        BoardNode boardNode;
+        BoardHandle::GetInstance()->GetBoardInfo(stSrcPort.m_iBoardId, boardNode);
+        if (boardNode.m_strBoardType == "OSCAD")
+        {
+            PortNode stOscadPortNode = stSrcPort;
+            if (stSrcPort.m_strPortKey == "MAIN") {
+                stOscadPortNode.m_strPortKey = "OSC";
+            }
+            else if (stSrcPort.m_strPortKey == "OSC") {
+                stOscadPortNode.m_strPortKey = "MAIN";
+            }
+
+            if (m_mapPortNode2Fiber.find(stOscadPortNode) != m_mapPortNode2Fiber.end())
+            {
+                stPairPortNode = m_mapPortNode2Fiber[stOscadPortNode].m_DstPortNode;
+            }
+            else{
+                return false;
             }
         }
+        
+        return true;
     }
     return false;
 }
@@ -279,9 +296,7 @@ void initFiberMap() {
     
     unique_lock<mutex> lock(mtx_port_fiber);
     for (const auto& fiber : vFiberInfo) {
-        for (const auto& portNode : fiber.m_vPortNode) {
-            m_mapPortNode2Fiber[portNode] = fiber;
-        }
+        m_mapPortNode2Fiber[fiber.m_DstPortNode] = fiber;
     }
 }
 

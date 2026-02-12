@@ -23,25 +23,22 @@ enum FiberColor
 
 struct PortNode
 {
-    PortNode(int iNeId, int iBoardId, const string& strPortKey)
-        : m_iNeId(iNeId), m_iBoardId(iBoardId), m_strPortKey(strPortKey) {}
+    PortNode(int iBoardId, const string& strPortKey)
+        : m_iBoardId(iBoardId), m_strPortKey(strPortKey) {}
     ~PortNode() {}
 
     bool operator<(const PortNode& other) const
     {
-        if (m_iNeId != other.m_iNeId)
-            return m_iNeId < other.m_iNeId;
-        else if (m_iBoardId != other.m_iBoardId)
+        if (m_iBoardId != other.m_iBoardId)
             return m_iBoardId < other.m_iBoardId;
         return m_strPortKey < other.m_strPortKey;
     }
 
     bool operator != (const PortNode& other) const
     {
-        return m_iNeId != other.m_iNeId || m_iBoardId != other.m_iBoardId || m_strPortKey != other.m_strPortKey;
+        return m_iBoardId != other.m_iBoardId || m_strPortKey != other.m_strPortKey;
     }
 
-    int m_iNeId;                //网元ID
     int m_iBoardId;             //板卡ID
     std::string m_strPortKey;   //端口键值
 };
@@ -68,8 +65,8 @@ enum AlarmType
 // 定义结构体 AlarmNode，用于表示告警节点
 struct AlarmNode
 {
-    AlarmNode(int iNeId, int iBoardId, const string& strPortKey, AlarmLevel eAlarmLevel, AlarmType eAlarmType)
-        : m_stPortNode(iNeId, iBoardId, strPortKey), m_eAlarmLevel(eAlarmLevel), m_eAlarmType(eAlarmType) {}
+    AlarmNode(int iBoardId, const string& strPortKey, AlarmLevel eAlarmLevel, AlarmType eAlarmType)
+        : m_stPortNode(iBoardId, strPortKey), m_eAlarmLevel(eAlarmLevel), m_eAlarmType(eAlarmType) {}
     ~AlarmNode() {}
 
     PortNode m_stPortNode;      //端口节点

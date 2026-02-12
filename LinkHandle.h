@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <map>
 #include "CommonStruck.h"
 
 using namespace std;

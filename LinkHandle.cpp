@@ -31,29 +31,69 @@ LinkHandle* LinkHandle::GetInstance()
 
 void LinkHandle::initializeLinkHandle()
 {
-    // 创建一个连纤，关联3个端口（测试多端口连纤场景）
+    BoardNode OscadBoard;
+    OscadBoard.m_strBoardType = "OSCAD";
+    OscadBoard.m_vecPortKey.push_back("LINE");
+    OscadBoard.m_vecPortKey.push_back("MAIN");
+    OscadBoard.m_vecPortKey.push_back("OSC");
+
+    int iSrcOscadBoardId = 1;
+    int iDesOscadBoardId = 2;
+    BoardHandle::GetInstance()->CreateBoardInfo(iSrcOscadBoardId, OscadBoard);
+    BoardHandle::GetInstance()->CreateBoardInfo(iDesOscadBoardId, OscadBoard);
+
+    BoardNode stOaBoard;
+    stOaBoard.m_strBoardType = "OA";
+    stOaBoard.m_vecPortKey.push_back("OUT");
+    stOaBoard.m_vecPortKey.push_back("IN");
+    int iSrcOaBoardId = 3;
+    int iDesOaBoardId = 4;
+    BoardHandle::GetInstance()->CreateBoardInfo(iSrcOaBoardId, stOaBoard);
+    BoardHandle::GetInstance()->CreateBoardInfo(iDesOaBoardId, stOaBoard);
+
+    BoardNode stOscBoard;
+    stOscBoard.m_strBoardType = "OSC";
+    stOscBoard.m_vecPortKey.push_back("OSC_IN");
+    stOscBoard.m_vecPortKey.push_back("OSC_OUT");
+    int iSrcOscBoardId = 5;
+    int iDesOscBoardId = 6;
+    BoardHandle::GetInstance()->CreateBoardInfo(iSrcOscBoardId, stOscBoard);
+    BoardHandle::GetInstance()->CreateBoardInfo(iDesOscBoardId, stOscBoard);
+
     Fiber stFiber1;
     stFiber1.m_iLinkId = 1;
-    stFiber1.m_vPortNode.push_back({1, "Port1"});
-    stFiber1.m_vPortNode.push_back({2, "Port2"});
-    stFiber1.m_vPortNode.push_back({3, "Port3"}); // 添加第三个端口
+    stFiber1.m_DstPortNode = {iDesOscadBoardId, "LINE"};
+    stFiber1.m_SrcPortNode = {iSrcOscadBoardId, "LINE"};
 
     m_vFiberInfo.push_back(stFiber1);
 
-    // 创建一个连纤，关联2个端口（普通场景）
     Fiber stFiber2;
     stFiber2.m_iLinkId = 2;
-    stFiber2.m_vPortNode.push_back({4, "Port1"});
-    stFiber2.m_vPortNode.push_back({5, "Port2"});
+    stFiber2.m_DstPortNode = {iDesOaBoardId, "IN"};
+    stFiber2.m_SrcPortNode = {iDesOscadBoardId, "MAIN"};
 
     m_vFiberInfo.push_back(stFiber2);
 
-    // 创建一个连纤，只关联1个端口（特殊场景）
     Fiber stFiber3;
     stFiber3.m_iLinkId = 3;
-    stFiber3.m_vPortNode.push_back({6, "Port1"});
+    stFiber3.m_DstPortNode = {iDesOscBoardId, "OSC_IN"};
+    stFiber3.m_SrcPortNode = {iDesOscadBoardId, "OSC"};
 
     m_vFiberInfo.push_back(stFiber3);
+
+    Fiber stFiber4;
+    stFiber4.m_iLinkId = 4;
+    stFiber4.m_DstPortNode = {iSrcOscadBoardId, "MAIN"};
+    stFiber4.m_SrcPortNode = {iSrcOaBoardId, "MAIN"};
+
+    m_vFiberInfo.push_back(stFiber4);
+
+    Fiber stFiber5;
+    stFiber5.m_iLinkId = 5;
+    stFiber5.m_DstPortNode = {iSrcOscadBoardId, "OSC"};
+    stFiber5.m_SrcPortNode = {iDesOscBoardId, "OSC_OUT"};
+
+    m_vFiberInfo.push_back(stFiber5);
 }
 
 void LinkHandle::GetAllLinkInfo(vector<Fiber>& vFiberInfo)
